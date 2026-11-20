@@ -72,10 +72,10 @@
 
 ```bash
 # استنسخ المشروع
-git clone https://github.com/smarthrgoal/Language.git
+git clone https://github.com/smarthrgoal/language.git
 
 # انتقل للمجلد
-cd Language 
+cd language 
 
 # افتح الملف مباشرة في المتصفح
 # على Windows:
@@ -364,7 +364,7 @@ great-pyramid-academy/
 ## 📞 التواصل
 
 - 🌐 **الموقع**: [youtube.com/@smarthrgoal](#)
-- 📧 **البريد**: instagram.com/smarthrgoal
+- 📧 **البريد**: [instagram.com/smarthrgoal](#)
 - 💬 **GitHub Issues**: [أبلغ عن مشكلة](../../issues)
 
 ---
