@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-bs-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تعلّم Delphi vs Go vs Ring — منهج عملي متكامل</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+<style>
+:root{
+  --bg:#f4f7fb; --card:#ffffff; --text:#16202c; --muted:#64748b;
+  --border:#e2e8f0; --brand:#6d28d9; --brand-2:#0ea5e9;
+  --shadow:0 8px 28px rgba(15,23,42,.07);
+}
+[data-bs-theme="dark"]{
+  --bg:#0b1118; --card:#131c26; --text:#e6edf3; --muted:#93a4b5;
+  --border:#22303f; --brand:#a78bfa; --brand-2:#38bdf8;
+  --shadow:0 8px 28px rgba(0,0,0,.45);
+}
+body{
+  font-family:'Tajawal',system-ui,-apple-system,sans-serif;
+  background:var(--bg); color:var(--text);
+  padding-bottom:70px;
+}
+h1,h2,h3,h4,h5,h6{font-weight:800;}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative; overflow:hidden; color:#fff;
+  background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 45%,#0ea5e9 100%);
+  border-radius:0 0 30px 30px;
+  padding:52px 0 60px;
+}
+.hero::after{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(circle at 15% 20%, rgba(255,255,255,.16), transparent 45%),
+             radial-gradient(circle at 85% 80%, rgba(255,255,255,.12), transparent 45%);
+  pointer-events:none;
+}
+.hero .badge-soft{
+  background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+  border-radius:999px; padding:.35rem .9rem; font-weight:700; font-size:.85rem;
+}
+.hero h1{font-size:clamp(1.6rem,3.4vw,2.6rem); line-height:1.4;}
+.hero p.lead{color:rgba(255,255,255,.9); font-size:1.02rem;}
+.hero-progress{
+  background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.28);
+  border-radius:18px; padding:16px 18px; backdrop-filter:blur(6px);
+}
+.hero-progress .progress{height:12px; background:rgba(255,255,255,.22); border-radius:99px;}
+.hero-progress .progress-bar{background:linear-gradient(90deg,#facc15,#22c55e); font-size:.65rem; font-weight:800;}
+
+/* ============ MAIN TABS ============ */
+.main-tabs{
+  background:var(--card); border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:1020; box-shadow:0 2px 14px rgba(0,0,0,.05);
+}
+.main-tabs .nav{flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin;}
+.main-tabs .nav-link{
+  white-space:nowrap; color:var(--muted); font-weight:700; font-size:.92rem;
+  border-radius:12px; padding:.55rem .95rem; margin:8px 2px;
+}
+.main-tabs .nav-link:hover{background:rgba(109,40,217,.08); color:var(--brand);}
+.main-tabs .nav-link.active{
+  background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:#fff !important;
+}
+
+/* ============ CARDS ============ */
+.panel{
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:26px; box-shadow:var(--shadow);
+}
+.section-title{display:flex; align-items:center; gap:.6rem; margin-bottom:1rem;}
+.section-title i{color:var(--brand); font-size:1.4rem;}
+
+/* ============ LESSON NAV ============ */
+.lesson-nav{
+  max-height:78vh; overflow-y:auto; padding:8px;
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  box-shadow:var(--shadow);
+}
+.lesson-nav .nav-link{
+  display:flex; align-items:center; justify-content:space-between; gap:.5rem;
+  text-align:right; color:var(--text); font-size:.9rem; font-weight:600;
+  border-radius:11px; padding:.55rem .7rem; margin-bottom:4px; line-height:1.5;
+}
+.lesson-nav .nav-link:hover{background:rgba(109,40,217,.09); color:var(--brand);}
+.lesson-nav .nav-link.active{
+  background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:#fff;
+}
+.lesson-nav .tick{opacity:.2; font-size:.9rem; flex:0 0 auto;}
+.lesson-nav .nav-link.done .tick{opacity:1; color:#22c55e;}
+.lesson-nav .nav-link.active.done .tick{color:#bbf7d0;}
+
+/* ============ LESSON PANE ============ */
+.lesson-pane{
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:26px; box-shadow:var(--shadow);
+}
+.lesson-pane.is-done{border-color:rgba(34,197,94,.55); box-shadow:0 0 0 3px rgba(34,197,94,.09);}
+.lesson-title{font-size:1.25rem; margin-bottom:.9rem; color:var(--brand);}
+.sub{
+  margin-top:1.5rem; margin-bottom:.6rem; font-weight:800; font-size:1rem;
+  display:flex; align-items:center; gap:.45rem; color:var(--brand);
+}
+.sub::before{content:""; width:8px; height:8px; border-radius:3px; background:var(--brand-2); display:inline-block;}
+.learn-list{list-style:none; padding-right:0; margin:0;}
+.learn-list li{padding:.3rem 0 .3rem 0; position:relative; padding-right:1.6rem; font-size:.96rem;}
+.learn-list li::before{
+  content:"\F26E"; font-family:"bootstrap-icons"; position:absolute; right:0; top:.35rem;
+  color:#22c55e; font-size:.9rem;
+}
+.callout{
+  background:rgba(14,165,233,.09); border-right:4px solid var(--brand-2);
+  border-radius:12px; padding:.85rem 1rem; margin-top:1.1rem; font-size:.95rem;
+}
+.callout.warn{background:rgba(245,158,11,.11); border-right-color:#f59e0b;}
+.callout.danger{background:rgba(239,68,68,.10); border-right-color:#ef4444;}
+.chip{
+  background:rgba(109,40,217,.1); color:var(--brand); font-weight:700;
+  border-radius:999px; padding:.3rem .8rem; font-size:.82rem;
+}
+table.tbl{width:100%; font-size:.93rem;}
+table.tbl th{background:rgba(109,40,217,.08); font-weight:800; padding:.6rem .7rem;}
+table.tbl td{border-bottom:1px solid var(--border); padding:.6rem .7rem; vertical-align:top;}
+table.tbl tr:hover td{background:rgba(109,40,217,.04);}
+
+/* ============ CODE ============ */
+pre{
+  position:relative; direction:ltr; text-align:left;
+  border-radius:13px; margin:14px 0; font-size:.86rem; padding:0;
+  overflow:hidden;
+}
+pre code{display:block; padding:16px; font-family:'Consolas','Fira Code',monospace; line-height:1.6;}
+.copy-btn{
+  position:absolute; top:8px; left:8px; z-index:3;
+  background:rgba(255,255,255,.14); color:#e2e8f0; border:1px solid rgba(255,255,255,.25);
+  border-radius:8px; font-size:.72rem; padding:.2rem .55rem; font-family:'Tajawal',sans-serif;
+  cursor:pointer; transition:.2s;
+}
+.copy-btn:hover{background:rgba(255,255,255,.28);}
+
+/* ============ MISC ============ */
+.lesson-foot{margin-top:1.6rem; padding-top:1rem; border-top:1px dashed var(--border);}
+.roadmap{
+  direction:ltr; text-align:left; background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:18px; font-family:monospace; font-size:.82rem;
+  white-space:pre; overflow-x:auto; color:var(--text);
+}
+.accordion-button:not(.collapsed){background:rgba(109,40,217,.09); color:var(--brand); box-shadow:none;}
+.accordion-button:focus{box-shadow:none;}
+footer.site{border-top:1px solid var(--border); margin-top:50px; padding-top:22px; color:var(--muted); font-size:.9rem;}
+.back-top{
+  position:fixed; bottom:22px; left:22px; z-index:1050;
+  width:46px; height:46px; border-radius:50%; display:none;
+  align-items:center; justify-content:center; box-shadow:var(--shadow);
+}
+@media (max-width:991px){
+  .lesson-nav{max-height:260px; margin-bottom:14px;}
+  .lesson-pane{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="container position-relative">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge-soft d-inline-block mb-3">
+          <i class="bi bi-mortarboard-fill"></i> منهج تعليمي متكامل — من الصفر حتى نظام ERP
+        </span>
+        <h1 class="mb-3">تعلّم <span style="color:#facc15">Delphi</span> و<span style="color:#facc15">Go</span> و<span style="color:#facc15">Ring</span><br>ثم بناء تطبيقات ويب احترافية</h1>
+        <p class="lead mb-0">
+          33 درساً تفاعلياً + 10 مشروعات متدرجة + ربط Delphi بالويب عبر REST API.
+          كل درس في تبويب مستقل مع شرح ومثال وتدريب ومشروع.
+        </p>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-progress">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong><i class="bi bi-graph-up-arrow"></i> تقدّمك الكلي</strong>
+            <span id="overallCount" class="small">0 / 0 درس</span>
+          </div>
+          <div class="progress mb-2">
+            <div id="overallBar" class="progress-bar" style="width:0%"></div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">النسبة المئوية</span>
+            <strong id="overallPct">0%</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== MAIN TABS ===================== -->
+<nav class="main-tabs">
+  <div class="container">
+    <ul class="nav nav-pills" id="mainTabs" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-overview" type="button"><i class="bi bi-compass"></i> نظرة عامة</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-compare" type="button"><i class="bi bi-columns-gap"></i> Delphi vs Go vs Ring</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-delphi" type="button"><i class="bi bi-window-desktop"></i> المرحلة 1: Delphi</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-web" type="button"><i class="bi bi-code-slash"></i> المرحلة 2: الويب</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-integrate" type="button"><i class="bi bi-plug"></i> المرحلة 3: الربط</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-projects" type="button"><i class="bi bi-kanban"></i> المشروعات</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-timeline" type="button"><i class="bi bi-calendar3"></i> الخطة الزمنية</button></li>
+      <li class="nav-item ms-auto">
+        <button class="nav-link" id="themeBtn" type="button" title="تبديل الوضع الليلي"><i class="bi bi-moon-stars"></i></button>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<main class="container my-4">
+  <div class="tab-content" id="mainTabContent">
+
+    <!-- ============================================================
+         TAB 1 : OVERVIEW
+    ============================================================ -->
+    <div class="tab-pane fade show active" id="tab-overview">
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-compass"></i> فكرة المنهج</h2>
+        <p>
+          هذا المنهج مصمم ليأخذك من <strong>الصفر</strong> حتى بناء نظام إداري متكامل. نبدأ بأساسيات البرمجة
+          في <strong>Delphi</strong>، ثم نتعرف على لغتي <strong>Go</strong> و<strong>Ring</strong> ومتى نستخدم كل واحدة،
+          ثم ننتقل إلى تطوير الويب بـ HTML وCSS وJavaScript وBootstrap، وأخيراً نربط Delphi بالويب
+          عبر <strong>REST API</strong> لنحصل على نظام حقيقي متعدد الطبقات.
+        </p>
+        <div class="roadmap mt-3">             المستخدم
+                 |
+        HTML + CSS + Bootstrap
+                 |
+             JavaScript
+                 |
+              REST API
+                 |
+               Delphi  ──────►  Database (SQLite / Firebird / MySQL)
+                 |
+        ┌────────┴────────┐
+      Go (خدمات سحابية)   Ring (نماذج سريعة / تعلم)</div>
+      </div>
+
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-diagram-3"></i> أقسام المنهج</h2>
+        <div class="table-responsive">
+          <table class="tbl">
+            <thead><tr><th>القسم</th><th>المحتوى</th><th>عدد الدروس</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>أساسيات Delphi (متغيرات، شروط، حلقات، دوال، OOP)</td><td>10</td></tr>
+              <tr><td>2</td><td>تصميم تطبيقات سطح المكتب + قواعد البيانات + JSON + REST</td><td>10</td></tr>
+              <tr><td>3</td><td>HTML — هيكل الصفحات والنماذج والجداول</td><td>3</td></tr>
+              <tr><td>4</td><td>CSS — التنسيق والتخطيط والتصميم المتجاوب</td><td>3</td></tr>
+              <tr><td>5</td><td>JavaScript — الأساسيات و DOM والتخزين و API</td><td>4</td></tr>
+              <tr><td>6</td><td>Bootstrap — الشبكة والمكونات ولوحات التحكم</td><td>3</td></tr>
+              <tr><td>7</td><td>ربط Delphi بالويب (REST API + JSON + fetch)</td><td>مرحلة كاملة</td></tr>
+              <tr><td>8</td><td>10 مشروعات متدرجة + مشروع ERP نهائي</td><td>10</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title"><i class="bi bi-list-check"></i> طريقة شرح كل درس</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <ul class="learn-list">
+              <li>اسم الدرس والهدف منه.</li>
+              <li>الشرح النظري بلغة عربية مبسطة.</li>
+              <li>شرح كل سطر برمجي.</li>
+              <li>مثال بسيط لتطبيق الفكرة.</li>
+              <li>مثال متوسط في برنامج حقيقي.</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="learn-list">
+              <li>مثال متقدم يربط الدرس بغيره.</li>
+              <li>الأخطاء الشائعة وكيفية معالجتها.</li>
+              <li>تدريب عملي تنفذه بنفسك.</li>
+              <li>مشروع صغير يجمع ما تعلمته.</li>
+              <li>اختبار سريع للتأكد من الفهم.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout mt-3">
+          <strong>نصيحة الترتيب:</strong> لا تبدأ بـ Bootstrap قبل إتقان HTML وCSS، ولا تنتقل إلى ربط Delphi بالويب
+          قبل فهم قواعد البيانات و JSON و REST API.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 2 : COMPARE
+    ============================================================ -->
+    <div class="tab-pane fade" id="tab-compare">
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-columns-gap"></i> مقارنة عملية: Delphi vs Go vs Ring</h2>
+        <p class="text-muted mb-3">ثلاث لغات مختلفة في الفلسفة والاستخدام — والمنهج يعلمك Delphi أولاً لأنه الأقرب لبناء الأنظمة الإدارية المتكاملة.</p>
+        <div class="table-responsive">
+          <table class="tbl">
+            <thead>
+              <tr><th>المعيار</th><th>Delphi</th><th>Go</th><th>Ring</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>النشأة</strong></td><td>1995 — Borland</td><td>2009 — Google</td><td>2016 — محمود فوزي</td></tr>
+              <tr><td><strong>النمط</strong></td><td>كائنية بالكامل، مبنية على Pascal</td><td>مجمّعة، بسيطة، مع Goroutines</td><td>متعددة الأنماط، صغيرة الحجم</td></tr>
+              <tr><td><strong>بيئة العمل</strong></td><td>RAD Studio — سحب وإفلات</td><td>VS Code / GoLand + سطر أوامر</td><td>Ring Notepad / VS Code</td></tr>
+              <tr><td><strong>الأداء</strong></td><td>عالي جداً (Native)</td><td>عالي جداً (Native)</td><td>متوسط إلى عالي</td></tr>
+              <tr><td><strong>واجهات سطح المكتب</strong></td><td>قوية جداً (VCL / FMX)</td><td>محدودة (مكتبات خارجية)</td><td>ممكنة (RingQt)</td></tr>
+              <tr><td><strong>تطوير الويب</strong></td><td>REST / DataSnap / IntraWeb</td><td>قوية جداً (net/http, Gin)</td><td>Ring MVC / CGI</td></tr>
+              <tr><td><strong>قواعد البيانات</strong></td><td>FireDAC (SQLite, Firebird, MySQL, Oracle)</td><td>database/sql + Drivers</td><td>ODBC / SQLite</td></tr>
+              <tr><td><strong>سرعة التطوير</strong></td><td>سريعة جداً (RAD)</td><td>سريعة</td><td>سريعة جداً (بساطة)</td></tr>
+              <tr><td><strong>منحنى التعلّم</strong></td><td>متوسط</td><td>سهل</td><td>سهل جداً</td></tr>
+              <tr><td><strong>الاستخدام الشائع</strong></td><td>أنظمة إدارية، ERP، تطبيقات Windows</td><td>خدمات سحابية، Docker، Kubernetes، APIs</td><td>تعلّم البرمجة، مشاريع صغيرة، ويب، ألعاب</td></tr>
+              <tr><td><strong>الترخيص</strong></td><td>تجاري (Community مجاني بشروط)</td><td>مفتوح المصدر</td><td>مفتوح المصدر</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="panel h-100">
+            <h5><i class="bi bi-window-desktop text-primary"></i> متى تختار Delphi؟</h5>
+            <ul class="learn-list">
+              <li>أنظمة إدارية ومحاسبية ومخازن.</li>
+              <li>تطبيقات Windows سريعة التطوير.</li>
+              <li>الربط المباشر بقواعد بيانات متعددة.</li>
+              <li>بناء API خلفي لواجهة ويب.</li>
+            </ul>
+<pre><code class="language-pascal">program Hello;
+begin
+  ShowMessage('Hello Delphi');
+end.</code></pre>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="panel h-100">
+            <h5><i class="bi bi-cloud-arrow-up text-info"></i> متى تختار Go؟</h5>
+            <ul class="learn-list">
+              <li>خدمات مصغّرة (Microservices).</li>
+              <li>خوادم سريعة ومتزامنة.</li>
+              <li>أدوات سطر الأوامر و DevOps.</li>
+              <li>أنظمة تحتاج أداءً عالياً جداً.</li>
+            </ul>
+<pre><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello Go")
+}</code></pre>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="panel h-100">
+            <h5><i class="bi bi-lightning-charge text-warning"></i> متى تختار Ring؟</h5>
+            <ul class="learn-list">
+              <li>التعلم السريع لمفاهيم البرمجة.</li>
+              <li>النماذج الأولية (Prototypes).</li>
+              <li>برامج صغيرة وألعاب بسيطة.</li>
+              <li>تطبيقات ويب خفيفة عبر Ring MVC.</li>
+            </ul>
+<pre><code class="language-plaintext">see "Hello Ring" + nl</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 3 : DELPHI (20 LESSONS)
+    ============================================================ -->
+    <div class="tab-pane fade" id="tab-delphi">
+      <div class="panel mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h2 class="section-title mb-0"><i class="bi bi-window-desktop"></i> المرحلة الأولى — Delphi في 20 خطوة</h2>
+          <input id="lessonSearch" class="form-control form-control-sm" style="max-width:260px" type="search" placeholder="🔍 ابحث في الدروس...">
+        </div>
+        <div class="mt-3" data-progress="delphi">
+          <div class="d-flex justify-content-between small mb-1">
+            <span class="prog-label">0 من 20 درس</span><span>تقدّم المرحلة</span>
+          </div>
+          <div class="progress" style="height:10px"><div class="progress-bar bg-success" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="row g-4 lesson-layout" data-section="delphi">
+        <div class="col-lg-4 col-xl-3">
+          <div class="nav flex-column nav-pills lesson-nav" role="tablist" aria-orientation="vertical"></div>
+        </div>
+        <div class="col-lg-8 col-xl-9">
+          <div class="tab-content">
+
+            <!-- D1 -->
+            <div class="tab-pane fade show active lesson-pane" id="d1" data-section="delphi" data-lesson="d1" data-title="1 · التعرف على Delphi و RAD Studio">
+              <h3 class="lesson-title">الخطوة 1: التعرف على لغة Delphi وبيئة RAD Studio</h3>
+              <p>Delphi لغة برمجة كائنية التوجه مبنية على Pascal، تشتهر بسرعة تطوير التطبيقات (RAD) وقدرتها على بناء
+                 أنظمة سطح مكتب احترافية مرتبطة بقواعد البيانات. بيئتها الرسمية هي <strong>RAD Studio</strong>.</p>
+              <h6 class="sub">ما ستتعلمه</h6>
+              <ul class="learn-list">
+                <li>ما هي Delphi واستخداماتها ومميزاتها.</li>
+                <li>الفرق بينها وبين اللغات الأخرى.</li>
+                <li>التعرف على بيئة RAD Studio ومكوناتها.</li>
+                <li>إنشاء أول مشروع وتشغيله.</li>
+              </ul>
+              <h6 class="sub">أول برنامج</h6>
+<pre><code class="language-pascal">program HelloWorld;
+
+begin
+  ShowMessage('Hello Delphi');
+end.</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج يعرض رسالة ترحيب. جرّب تغيير النص، ثم أنشئ مشروعاً جديداً من نوع VCL Forms وشغّله.</div>
+            </div>
+
+            <!-- D2 -->
+            <div class="tab-pane fade lesson-pane" id="d2" data-section="delphi" data-lesson="d2" data-title="2 · المتغيرات وأنواع البيانات">
+              <h3 class="lesson-title">الخطوة 2: المتغيرات وأنواع البيانات</h3>
+              <p>المتغير هو مكان في الذاكرة نحفظ فيه قيمة، ولكل متغير نوع يحدد شكل البيانات التي يمكن تخزينها.</p>
+              <h6 class="sub">الأنواع الأساسية</h6>
+              <ul class="learn-list">
+                <li><code>Integer</code> — أعداد صحيحة.</li>
+                <li><code>Real</code> / <code>Double</code> — أعداد عشرية.</li>
+                <li><code>String</code> — نصوص.</li>
+                <li><code>Boolean</code> — صحيح/خطأ.</li>
+                <li><code>Char</code> — حرف واحد.</li>
+                <li><code>Currency</code> — مبالغ مالية.</li>
+                <li><code>TDateTime</code> — التاريخ والوقت.</li>
+              </ul>
+<pre><code class="language-pascal">var
+  Name: string;
+  Age: Integer;
+  Salary: Currency;
+
+begin
+  Name := 'Ahmed';
+  Age := 25;
+  Salary := 5000;
+
+  ShowMessage(Name + ' - ' + IntToStr(Age));
+end;</code></pre>
+              <div class="callout">🎯 <strong>التدريب:</strong> أنشئ متغيرات للاسم والعمر والراتب واعرضها في رسالة واحدة.</div>
+            </div>
+
+            <!-- D3 -->
+            <div class="tab-pane fade lesson-pane" id="d3" data-section="delphi" data-lesson="d3" data-title="3 · العمليات الحسابية">
+              <h3 class="lesson-title">الخطوة 3: العمليات الحسابية</h3>
+              <p>نتعلم الجمع والطرح والضرب والقسمة وباقي القسمة والمقارنة. لاحظ أن <code>/</code> تعيد رقماً عشرياً،
+                 بينما <code>div</code> تعيد القسمة الصحيحة و<code>mod</code> باقي القسمة.</p>
+<pre><code class="language-pascal">var
+  A, B: Integer;
+  Result: Double;
+
+begin
+  A := 10;
+  B := 3;
+
+  ShowMessage(IntToStr(A + B));      // 13
+  ShowMessage(IntToStr(A * B));      // 30
+  ShowMessage(IntToStr(A div B));    // 3
+  ShowMessage(IntToStr(A mod B));    // 1
+  Result := A / B;
+  ShowMessage(FloatToStr(Result));   // 3.3333
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> آلة حاسبة بسيطة بأربع عمليات على نموذج VCL.</div>
+            </div>
+
+            <!-- D4 -->
+            <div class="tab-pane fade lesson-pane" id="d4" data-section="delphi" data-lesson="d4" data-title="4 · الجمل الشرطية">
+              <h3 class="lesson-title">الخطوة 4: الجمل الشرطية</h3>
+              <p>تسمح للبرنامج باتخاذ قرار حسب تحقق شرط ما.</p>
+<pre><code class="language-pascal">var
+  Mark: Integer;
+begin
+  Mark := 85;
+
+  if Mark >= 90 then
+    ShowMessage('ممتاز')
+  else if Mark >= 75 then
+    ShowMessage('جيد جداً')
+  else if Mark >= 50 then
+    ShowMessage('ناجح')
+  else
+    ShowMessage('راسب');
+end;</code></pre>
+              <p class="mt-2">وتُستخدم <code>case</code> عندما تكون الاحتمالات متعددة وثابتة:</p>
+<pre><code class="language-pascal">case Day of
+  1: ShowMessage('السبت');
+  2: ShowMessage('الأحد');
+else
+  ShowMessage('يوم آخر');
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج يحدد تقدير الطالب بناءً على درجته.</div>
+            </div>
+
+            <!-- D5 -->
+            <div class="tab-pane fade lesson-pane" id="d5" data-section="delphi" data-lesson="d5" data-title="5 · الحلقات التكرارية">
+              <h3 class="lesson-title">الخطوة 5: الحلقات التكرارية</h3>
+              <p>الحلقات تكرر تنفيذ كود معين عدة مرات: <code>for</code> لعدد معلوم، <code>while</code> لشرط مسبق،
+                 و<code>repeat..until</code> لتنفيذ مرة على الأقل.</p>
+<pre><code class="language-pascal">var
+  I: Integer;
+  S: string;
+begin
+  S := '';
+  for I := 1 to 10 do
+    S := S + IntToStr(I) + ' ';
+
+  ShowMessage(S);
+
+  I := 1;
+  while I <= 5 do
+  begin
+    ShowMessage('While: ' + IntToStr(I));
+    Inc(I);
+  end;
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> جدول ضرب الرقم 7 من 1 إلى 10 داخل <code>TMemo</code>.</div>
+            </div>
+
+            <!-- D6 -->
+            <div class="tab-pane fade lesson-pane" id="d6" data-section="delphi" data-lesson="d6" data-title="6 · الإجراءات والدوال">
+              <h3 class="lesson-title">الخطوة 6: الإجراءات والدوال</h3>
+              <p><strong>Procedure</strong> تنفذ عملاً ولا تعيد قيمة، و<strong>Function</strong> تعيد قيمة عبر <code>Result</code>.
+                 وكلتاهما تقبل معاملات (Parameters).</p>
+<pre><code class="language-pascal">function Sum(A, B: Integer): Integer;
+begin
+  Result := A + B;
+end;
+
+function IsEven(N: Integer): Boolean;
+begin
+  Result := (N mod 2 = 0);
+end;
+
+procedure ShowWelcome(const Name: string);
+begin
+  ShowMessage('أهلاً ' + Name);
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> مكتبة دوال حسابية (جمع، طرح، متوسط، تحقق من الزوجية).</div>
+            </div>
+
+            <!-- D7 -->
+            <div class="tab-pane fade lesson-pane" id="d7" data-section="delphi" data-lesson="d7" data-title="7 · المصفوفات Arrays">
+              <h3 class="lesson-title">الخطوة 7: المصفوفات Arrays</h3>
+              <p>المصفوفة مجموعة عناصر من نفس النوع تُخزَّن تحت اسم واحد ويُوصل إليها بالفهرس.</p>
+<pre><code class="language-pascal">var
+  Numbers: array[1..5] of Integer;
+  I, Total: Integer;
+begin
+  Numbers[1] := 10;
+  Numbers[2] := 20;
+  Numbers[3] := 30;
+  Numbers[4] := 40;
+  Numbers[5] := 50;
+
+  Total := 0;
+  for I := 1 to 5 do
+    Total := Total + Numbers[I];
+
+  ShowMessage('المجموع = ' + IntToStr(Total));
+end;</code></pre>
+              <p>ويمكن استخدام <strong>Dynamic Arrays</strong> عند الحاجة لحجم متغير: <code>SetLength(Arr, N);</code></p>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج لتخزين درجات 10 طلاب وحساب المتوسط وأعلى درجة.</div>
+            </div>
+
+            <!-- D8 -->
+            <div class="tab-pane fade lesson-pane" id="d8" data-section="delphi" data-lesson="d8" data-title="8 · التعامل مع النصوص">
+              <h3 class="lesson-title">الخطوة 8: التعامل مع النصوص</h3>
+              <p>دوال النصوص من أكثر ما ستستخدمه عملياً عند التعامل مع بيانات المستخدمين والملفات.</p>
+<pre><code class="language-pascal">var
+  S: string;
+begin
+  S := '  Hello Delphi World  ';
+
+  ShowMessage(IntToStr(Length(S)));         // الطول
+  ShowMessage(Trim(S));                     // حذف المسافات
+  ShowMessage(UpperCase(Trim(S)));          // تحويل لأحرف كبيرة
+  ShowMessage(LowerCase(Trim(S)));          // تحويل لأحرف صغيرة
+  ShowMessage(Copy(Trim(S), 1, 5));         // Hello
+  ShowMessage(IntToStr(Pos('Delphi', S)));  // موضع الكلمة
+  ShowMessage(StringReplace(S, 'World', 'Ring', []));
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج تحليل نص: عدد الكلمات، البحث عن كلمة، واستبدالها.</div>
+            </div>
+
+            <!-- D9 -->
+            <div class="tab-pane fade lesson-pane" id="d9" data-section="delphi" data-lesson="d9" data-title="9 · البرمجة الكائنية OOP">
+              <h3 class="lesson-title">الخطوة 9: البرمجة الكائنية OOP</h3>
+              <p>الكائنات تجمع البيانات (Fields) والسلوك (Methods) في وحدة واحدة. نتعلم: Class، Object،
+                 Constructor، Destructor، Inheritance، Encapsulation، Polymorphism.</p>
+<pre><code class="language-pascal">type
+  TPerson = class
+  private
+    FName: string;
+    FAge: Integer;
+  public
+    constructor Create(const AName: string; AAge: Integer);
+    procedure Introduce;
+    property Name: string read FName write FName;
+    property Age: Integer read FAge write FAge;
+  end;
+
+constructor TPerson.Create(const AName: string; AAge: Integer);
+begin
+  inherited Create;
+  FName := AName;
+  FAge := AAge;
+end;
+
+procedure TPerson.Introduce;
+begin
+  ShowMessage('أنا ' + FName + ' وعمري ' + IntToStr(FAge));
+end;
+
+// الاستخدام
+var P: TPerson;
+begin
+  P := TPerson.Create('Ahmed', 25);
+  try
+    P.Introduce;
+  finally
+    P.Free;   // تحرير الذاكرة
+  end;
+end;</code></pre>
+              <div class="callout warn">⚠️ كل كائن يُنشأ بـ <code>Create</code> يجب تحريره بـ <code>Free</code> داخل <code>try..finally</code> لتجنب تسريب الذاكرة.</div>
+              <div class="callout">🎯 <strong>المشروع:</strong> نظام لإدارة بيانات الأشخاص مع فئة مشتقة <code>TEmployee</code> ترث من <code>TPerson</code>.</div>
+            </div>
+
+            <!-- D10 -->
+            <div class="tab-pane fade lesson-pane" id="d10" data-section="delphi" data-lesson="d10" data-title="10 · التعامل مع الملفات">
+              <h3 class="lesson-title">الخطوة 10: التعامل مع الملفات</h3>
+              <p>حفظ البيانات في ملفات TXT وCSV وJSON هو الخطوة الأولى قبل قواعد البيانات.</p>
+<pre><code class="language-pascal">var
+  Lines: TStringList;
+begin
+  Lines := TStringList.Create;
+  try
+    Lines.Add('Ahmed,01000000000');
+    Lines.Add('Mohamed,01100000000');
+    Lines.SaveToFile('customers.txt', TEncoding.UTF8);
+
+    Lines.Clear;
+    Lines.LoadFromFile('customers.txt', TEncoding.UTF8);
+    Memo1.Lines.Assign(Lines);
+  finally
+    Lines.Free;
+  end;
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج لحفظ بيانات العملاء في ملف CSV وقراءتها وعرضها في <code>TStringGrid</code>.</div>
+            </div>
+
+            <!-- D11 -->
+            <div class="tab-pane fade lesson-pane" id="d11" data-section="delphi" data-lesson="d11" data-title="11 · واجهة Delphi والمكونات">
+              <h3 class="lesson-title">الخطوة 11: التعرف على واجهة Delphi</h3>
+              <p>في RAD Studio تسحب المكونات من <strong>Tool Palette</strong> وتضعها على الـ <strong>Form</strong>،
+                 وتضبط خصائصها من <strong>Object Inspector</strong>.</p>
+              <div class="table-responsive">
+                <table class="tbl">
+                  <thead><tr><th>المكوّن</th><th>الوظيفة</th></tr></thead>
+                  <tbody>
+                    <tr><td>Form</td><td>النافذة الرئيسية التي تحمل باقي المكونات</td></tr>
+                    <tr><td>Button</td><td>زر لتنفيذ إجراء</td></tr>
+                    <tr><td>Label</td><td>نص ثابت للعرض</td></tr>
+                    <tr><td>Edit</td><td>حقل إدخال سطر واحد</td></tr>
+                    <tr><td>Memo</td><td>حقل إدخال متعدد الأسطر</td></tr>
+                    <tr><td>Panel</td><td>حاوية لتنظيم العناصر</td></tr>
+                    <tr><td>Image</td><td>عرض صورة</td></tr>
+                    <tr><td>ComboBox</td><td>قائمة منسدلة</td></tr>
+                    <tr><td>ListBox</td><td>قائمة عناصر</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout">🎯 <strong>التطبيق:</strong> تصميم شاشة تسجيل دخول (Label + Edit + Edit + Button).</div>
+            </div>
+
+            <!-- D12 -->
+            <div class="tab-pane fade lesson-pane" id="d12" data-section="delphi" data-lesson="d12" data-title="12 · الأحداث Events">
+              <h3 class="lesson-title">الخطوة 12: الأحداث Events</h3>
+              <p>الحدث هو رد فعل البرنامج على تصرف المستخدم أو النظام: <code>OnClick</code>، <code>OnChange</code>،
+                 <code>OnCreate</code>، <code>OnClose</code>، <code>OnKeyPress</code>.</p>
+<pre><code class="language-pascal">procedure TForm1.btnCalcClick(Sender: TObject);
+var
+  A, B: Integer;
+begin
+  A := StrToIntDef(Edit1.Text, 0);
+  B := StrToIntDef(Edit2.Text, 0);
+  Edit3.Text := IntToStr(A + B);
+end;
+
+procedure TForm1.Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+  // السماح بالأرقام فقط
+  if not (Key in ['0'..'9', #8]) then
+    Key := #0;
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> واجهة تفاعلية لآلة حاسبة تستجيب للأزرار وتتحقق من المدخلات.</div>
+            </div>
+
+            <!-- D13 -->
+            <div class="tab-pane fade lesson-pane" id="d13" data-section="delphi" data-lesson="d13" data-title="13 · تصميم الواجهات">
+              <h3 class="lesson-title">الخطوة 13: تصميم الواجهات</h3>
+              <p>التصميم الجيد ليس شكلاً فقط بل تجربة استخدام. راعِ التناسق والتباعد والوضوح.</p>
+              <ul class="learn-list">
+                <li>ترتيب العناصر بمحاذاة موحّدة (Alignment).</li>
+                <li>تغيير الألوان والخطوط وأحجامها.</li>
+                <li>ضبط حجم النافذة وخصائص <code>Anchors</code> و<code>Align</code>.</li>
+                <li>بناء القوائم (MainMenu) والتنقل بين النوافذ.</li>
+                <li>استخدام <code>TPageControl</code> لتنظيم الشاشات.</li>
+              </ul>
+              <div class="callout">🎯 <strong>المشروع:</strong> تصميم شاشة إدارة موظفين بقائمة جانبية وشريط أدوات وجدول بيانات.</div>
+            </div>
+
+            <!-- D14 -->
+            <div class="tab-pane fade lesson-pane" id="d14" data-section="delphi" data-lesson="d14" data-title="14 · قواعد البيانات و SQL">
+              <h3 class="lesson-title">الخطوة 14: قواعد البيانات و SQL</h3>
+              <p>نتعلم الجداول والحقول والمفاتيح الأساسية والعلاقات، ثم نبدأ بـ <strong>SQLite</strong>
+                 ونتعرف على Firebird وMySQL.</p>
+<pre><code class="language-sql">CREATE TABLE Customers (
+  ID     INTEGER PRIMARY KEY AUTOINCREMENT,
+  Name   VARCHAR(100) NOT NULL,
+  Phone  VARCHAR(20),
+  City   VARCHAR(50)
+);
+
+INSERT INTO Customers (Name, Phone, City)
+VALUES ('Ahmed', '01000000000', 'Cairo');
+
+SELECT * FROM Customers WHERE City = 'Cairo';
+
+UPDATE Customers SET Phone = '01111111111' WHERE ID = 1;
+
+DELETE FROM Customers WHERE ID = 1;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> إنشاء قاعدة بيانات للعملاء والموظفين مع علاقة بينهما.</div>
+            </div>
+
+            <!-- D15 -->
+            <div class="tab-pane fade lesson-pane" id="d15" data-section="delphi" data-lesson="d15" data-title="15 · ربط Delphi بقاعدة البيانات">
+              <h3 class="lesson-title">الخطوة 15: ربط Delphi بقاعدة البيانات (FireDAC)</h3>
+              <p>مكونات FireDAC الأساسية: <code>TFDConnection</code>، <code>TFDQuery</code>،
+                 <code>TDataSource</code>، <code>TDBGrid</code>، <code>TDBEdit</code>.</p>
+<pre><code class="language-pascal">procedure TDM.ConnectDB;
+begin
+  FDConnection1.Params.Clear;
+  FDConnection1.Params.Add('DriverID=SQLite');
+  FDConnection1.Params.Add('Database=customers.db');
+  FDConnection1.LoginPrompt := False;
+  FDConnection1.Connected := True;
+end;
+
+procedure TDM.LoadCustomers;
+begin
+  FDQuery1.Close;
+  FDQuery1.SQL.Text := 'SELECT * FROM Customers ORDER BY Name';
+  FDQuery1.Open;
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج CRUD كامل (إضافة/تعديل/حذف/عرض) للعملاء.</div>
+            </div>
+
+            <!-- D16 -->
+            <div class="tab-pane fade lesson-pane" id="d16" data-section="delphi" data-lesson="d16" data-title="16 · التعامل مع JSON">
+              <h3 class="lesson-title">الخطوة 16: التعامل مع JSON</h3>
+              <p>JSON هي صيغة تبادل البيانات القياسية بين Delphi والويب. في Delphi نستخدم
+                 <code>System.JSON</code> و<code>TJSONObject</code> و<code>TJSONArray</code>.</p>
+<pre><code class="language-json">{
+  "id": 1,
+  "name": "Ahmed",
+  "age": 25,
+  "skills": ["Delphi", "SQL", "JavaScript"]
+}</code></pre>
+<pre><code class="language-pascal">uses System.JSON;
+
+var
+  Obj: TJSONObject;
+  Arr: TJSONArray;
+begin
+  Obj := TJSONObject.Create;
+  try
+    Obj.AddPair('id', TJSONNumber.Create(1));
+    Obj.AddPair('name', 'Ahmed');
+    Obj.AddPair('age', TJSONNumber.Create(25));
+
+    Arr := TJSONArray.Create;
+    Arr.Add('Delphi');
+    Arr.Add('SQL');
+    Obj.AddPair('skills', Arr);
+
+    Memo1.Lines.Text := Obj.Format;   // نص JSON منسق
+  finally
+    Obj.Free;
+  end;
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> حفظ بيانات العملاء بصيغة JSON وقراءتها مرة أخرى.</div>
+            </div>
+
+            <!-- D17 -->
+            <div class="tab-pane fade lesson-pane" id="d17" data-section="delphi" data-lesson="d17" data-title="17 · الإنترنت و REST API">
+              <h3 class="lesson-title">الخطوة 17: التعامل مع الإنترنت و REST API</h3>
+              <p>نتعلم أفعال HTTP (GET, POST, PUT, DELETE) ومفهوم REST، ونستخدم مكتبة
+                 <code>REST Client</code> في Delphi للاتصال بأي خدمة خارجية.</p>
+<pre><code class="language-pascal">uses REST.Client, REST.Types;
+
+var
+  Client: TRESTClient;
+  Request: TRESTRequest;
+  Response: TRESTResponse;
+begin
+  Response := TRESTResponse.Create(nil);
+  Client   := TRESTClient.Create('https://api.example.com');
+  Request  := TRESTRequest.Create(nil);
+  try
+    Request.Client   := Client;
+    Request.Response := Response;
+    Request.Resource := 'customers';
+    Request.Method   := rmGET;
+
+    Request.Execute;
+
+    if Response.StatusCode = 200 then
+      Memo1.Lines.Text := Response.Content
+    else
+      ShowMessage('خطأ: ' + IntToStr(Response.StatusCode));
+  finally
+    Request.Free;
+    Client.Free;
+    Response.Free;
+  end;
+end;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج يقرأ بيانات من API عامة (مثل بيانات طقس) ويعرضها.</div>
+            </div>
+
+            <!-- D18 -->
+            <div class="tab-pane fade lesson-pane" id="d18" data-section="delphi" data-lesson="d18" data-title="18 · تطبيق متعدد الطبقات">
+              <h3 class="lesson-title">الخطوة 18: إنشاء تطبيق متعدد الطبقات</h3>
+              <p>تقسيم المشروع إلى طبقات يجعل الصيانة والتوسع أسهل بكثير:</p>
+              <div class="roadmap">Presentation Layer   →  الشاشات والنماذج (UI)
+Business Logic Layer →  القواعد والحسابات والتحقق
+Data Access Layer    →  الاستعلامات والاتصال بقاعدة البيانات
+Database Layer       →  الجداول والعلاقات</div>
+              <ul class="learn-list mt-3">
+                <li>كل طبقة تتواصل مع الطبقة التي تليها فقط.</li>
+                <li>الواجهة لا تعرف SQL مباشرة أبداً.</li>
+                <li>تسهل إعادة استخدام المنطق في تطبيق ويب لاحقاً.</li>
+              </ul>
+              <div class="callout">🎯 <strong>المشروع:</strong> نظام إدارة مخازن مقسّم إلى الطبقات الأربع.</div>
+            </div>
+
+            <!-- D19 -->
+            <div class="tab-pane fade lesson-pane" id="d19" data-section="delphi" data-lesson="d19" data-title="19 · الأمان والحماية">
+              <h3 class="lesson-title">الخطوة 19: الأمان والحماية</h3>
+              <ul class="learn-list">
+                <li>التحقق من صحة المدخلات قبل الحفظ.</li>
+                <li>حماية كلمات المرور باستخدام Hash + Salt.</li>
+                <li>إدارة صلاحيات المستخدمين (Roles).</li>
+                <li>إدارة الجلسات وانتهاء صلاحيتها.</li>
+                <li>معالجة الأخطاء دون كشف تفاصيل داخلية.</li>
+                <li>تشفير الاتصال عبر HTTPS.</li>
+              </ul>
+<pre><code class="language-pascal">uses System.Hash;
+
+function HashPassword(const Password, Salt: string): string;
+begin
+  Result := THashSHA2.GetHashString(Salt + Password);
+end;
+
+// عند تسجيل الدخول نقارن الهاش فقط، ولا نخزّن كلمة المرور أبداً
+if HashPassword(InputPass, UserSalt) = StoredHash then
+  ShowMessage('مرحباً بك')
+else
+  ShowMessage('بيانات الدخول غير صحيحة');</code></pre>
+              <div class="callout danger">🔒 لا تخزّن كلمات المرور كنص صريح أبداً، ولا تبنِ استعلامات SQL بدمج النصوص مباشرة
+                (استخدم Parameterized Queries لمنع SQL Injection).</div>
+            </div>
+
+            <!-- D20 -->
+            <div class="tab-pane fade lesson-pane" id="d20" data-section="delphi" data-lesson="d20" data-title="20 · مشروع Delphi متكامل">
+              <h3 class="lesson-title">الخطوة 20: مشروع Delphi متكامل</h3>
+              <p>نظام إدارة شركة كامل يجمع كل ما تعلمته:</p>
+              <div class="row">
+                <div class="col-md-6">
+                  <ul class="learn-list">
+                    <li>إدارة الموظفين.</li>
+                    <li>إدارة العملاء.</li>
+                    <li>إدارة المنتجات.</li>
+                    <li>إدارة المخازن.</li>
+                    <li>المبيعات.</li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <ul class="learn-list">
+                    <li>المشتريات.</li>
+                    <li>التقارير.</li>
+                    <li>المستخدمون والصلاحيات.</li>
+                    <li>قاعدة بيانات مركزية.</li>
+                    <li>تصميم متعدد الطبقات.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="callout">🎯 <strong>المخرَج:</strong> تطبيق سطح مكتب احترافي جاهز للتحول إلى نظام ويب في المرحلة الثالثة.</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 4 : WEB (13 LESSONS)
+    ============================================================ -->
+    <div class="tab-pane fade" id="tab-web">
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-code-slash"></i> المرحلة الثانية — HTML / CSS / JavaScript / Bootstrap</h2>
+        <div class="table-responsive mb-3">
+          <table class="tbl">
+            <thead><tr><th>التقنية</th><th>وظيفتها</th></tr></thead>
+            <tbody>
+              <tr><td>HTML</td><td>بناء هيكل الصفحة</td></tr>
+              <tr><td>CSS</td><td>تنسيق الصفحة والألوان والخطوط</td></tr>
+              <tr><td>JavaScript</td><td>إضافة التفاعل والعمليات</td></tr>
+              <tr><td>Bootstrap</td><td>تصميم واجهات احترافية سريعة ومتجاوبة</td></tr>
+              <tr><td>Delphi</td><td>منطق النظام والخدمات الخلفية وقواعد البيانات</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div data-progress="web">
+          <div class="d-flex justify-content-between small mb-1">
+            <span class="prog-label">0 من 13 درس</span><span>تقدّم المرحلة</span>
+          </div>
+          <div class="progress" style="height:10px"><div class="progress-bar bg-info" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="row g-4 lesson-layout" data-section="web">
+        <div class="col-lg-4 col-xl-3">
+          <div class="nav flex-column nav-pills lesson-nav" role="tablist" aria-orientation="vertical"></div>
+        </div>
+        <div class="col-lg-8 col-xl-9">
+          <div class="tab-content">
+
+            <!-- W1 -->
+            <div class="tab-pane fade show active lesson-pane" id="w1" data-section="web" data-lesson="w1" data-title="HTML 1 · أساسيات HTML">
+              <h3 class="lesson-title">HTML — الخطوة 1: أساسيات HTML</h3>
+              <p>HTML هي لغة بناء هيكل الصفحة: العناوين، الفقرات، الروابط، الصور، القوائم.</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ar" dir="rtl"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;أول صفحة&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;مرحباً بك&lt;/h1&gt;
+    &lt;p&gt;هذه أول صفحة ويب لي.&lt;/p&gt;
+    &lt;a href="https://example.com"&gt;زيارة الموقع&lt;/a&gt;
+    &lt;img src="photo.jpg" alt="صورة شخصية"&gt;
+
+    &lt;ul&gt;
+        &lt;li&gt;HTML&lt;/li&gt;
+        &lt;li&gt;CSS&lt;/li&gt;
+        &lt;li&gt;JavaScript&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;button&gt;اضغط هنا&lt;/button&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> صفحة شخصية بسيطة تحتوي اسمك وصورتك ومعلوماتك ووسائل تواصلك.</div>
+            </div>
+
+            <!-- W2 -->
+            <div class="tab-pane fade lesson-pane" id="w2" data-section="web" data-lesson="w2" data-title="HTML 2 · النماذج Forms">
+              <h3 class="lesson-title">HTML — الخطوة 2: النماذج Forms</h3>
+              <p>النماذج هي وسيلة إدخال البيانات من المستخدم إلى الخادم.</p>
+<pre><code class="language-html">&lt;form action="/register" method="post"&gt;
+
+    &lt;label for="name"&gt;الاسم&lt;/label&gt;
+    &lt;input type="text" id="name" name="name" required&gt;
+
+    &lt;label for="email"&gt;البريد الإلكتروني&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" required&gt;
+
+    &lt;label for="pass"&gt;كلمة المرور&lt;/label&gt;
+    &lt;input type="password" id="pass" name="pass" minlength="8"&gt;
+
+    &lt;label for="birth"&gt;تاريخ الميلاد&lt;/label&gt;
+    &lt;input type="date" id="birth" name="birth"&gt;
+
+    &lt;select name="city"&gt;
+        &lt;option value="cairo"&gt;القاهرة&lt;/option&gt;
+        &lt;option value="giza"&gt;الجيزة&lt;/option&gt;
+    &lt;/select&gt;
+
+    &lt;label&gt;&lt;input type="checkbox" name="agree"&gt; أوافق على الشروط&lt;/label&gt;
+
+    &lt;button type="submit"&gt;تسجيل&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> صفحة تسجيل مستخدم كاملة مع التحقق من المدخلات.</div>
+            </div>
+
+            <!-- W3 -->
+            <div class="tab-pane fade lesson-pane" id="w3" data-section="web" data-lesson="w3" data-title="HTML 3 · الجداول">
+              <h3 class="lesson-title">HTML — الخطوة 3: الجداول</h3>
+              <p>الجداول أساسية في الأنظمة الإدارية لعرض البيانات (عملاء، موظفين، فواتير).</p>
+<pre><code class="language-html">&lt;table&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;#&lt;/th&gt;
+            &lt;th&gt;الاسم&lt;/th&gt;
+            &lt;th&gt;الهاتف&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;1&lt;/td&gt;
+            &lt;td&gt;أحمد&lt;/td&gt;
+            &lt;td&gt;01000000000&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;2&lt;/td&gt;
+            &lt;td&gt;محمد&lt;/td&gt;
+            &lt;td&gt;01100000000&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> جدول بيانات الموظفين مع رأس وجسم الجدول.</div>
+            </div>
+
+            <!-- W4 -->
+            <div class="tab-pane fade lesson-pane" id="w4" data-section="web" data-lesson="w4" data-title="CSS 4 · أساسيات CSS">
+              <h3 class="lesson-title">CSS — الخطوة 4: أساسيات CSS</h3>
+              <p>CSS تتحكم في الشكل: الألوان، الخلفيات، الخطوط، الأبعاد، الهوامش والحدود.</p>
+<pre><code class="language-css">body {
+  font-family: 'Tajawal', sans-serif;
+  background: #f4f7fb;
+  color: #16202c;
+}
+
+.card {
+  width: 320px;
+  margin: 20px auto;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+}
+
+.card h2 {
+  color: #6d28d9;
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+}</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> تنسيق صفحة تسجيل الدخول ببطاقة مركزية وظلال وألوان متناسقة.</div>
+            </div>
+
+            <!-- W5 -->
+            <div class="tab-pane fade lesson-pane" id="w5" data-section="web" data-lesson="w5" data-title="CSS 5 · تخطيط الصفحات">
+              <h3 class="lesson-title">CSS — الخطوة 5: تخطيط الصفحات</h3>
+              <p>نتعلم Display وPosition وFlexbox وGrid وBox Model وOverflow.</p>
+<pre><code class="language-css">/* Flexbox */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Grid */
+.dashboard {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> تصميم لوحة تحكم Dashboard بشريط جانبي ومنطقة محتوى وبطاقات إحصائية.</div>
+            </div>
+
+            <!-- W6 -->
+            <div class="tab-pane fade lesson-pane" id="w6" data-section="web" data-lesson="w6" data-title="CSS 6 · التصميم المتجاوب">
+              <h3 class="lesson-title">CSS — الخطوة 6: التصميم المتجاوب</h3>
+              <p>التصميم المتجاوب يجعل الموقع يعمل على الكمبيوتر والتابلت والموبايل. نستخدم
+                 <code>Media Queries</code> ونهج <strong>Mobile First</strong>.</p>
+<pre><code class="language-css">/* Mobile First: التنسيق الأساسي للموبايل */
+.container { padding: 12px; }
+.sidebar  { display: none; }
+
+/* تابلت */
+@media (min-width: 768px) {
+  .container { padding: 20px; }
+}
+
+/* كمبيوتر */
+@media (min-width: 1024px) {
+  .container { max-width: 1200px; margin: auto; }
+  .sidebar   { display: block; }
+}</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> موقع يعمل بشكل سليم على جميع أحجام الشاشات.</div>
+            </div>
+
+            <!-- W7 -->
+            <div class="tab-pane fade lesson-pane" id="w7" data-section="web" data-lesson="w7" data-title="JS 7 · أساسيات JavaScript">
+              <h3 class="lesson-title">JavaScript — الخطوة 7: الأساسيات</h3>
+              <p>المتغيرات، أنواع البيانات، العمليات، الشروط، الحلقات، الدوال.</p>
+<pre><code class="language-javascript">let price = 100;
+let quantity = 5;
+
+let total = price * quantity;
+
+if (total &gt; 400) {
+  console.log('خصم 10%');
+  total = total * 0.9;
+}
+
+function formatCurrency(value) {
+  return value.toFixed(2) + ' ج.م';
+}
+
+console.log(formatCurrency(total));</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> آلة حاسبة تعمل على الويب بأربع عمليات.</div>
+            </div>
+
+            <!-- W8 -->
+            <div class="tab-pane fade lesson-pane" id="w8" data-section="web" data-lesson="w8" data-title="JS 8 · التعامل مع DOM">
+              <h3 class="lesson-title">JavaScript — الخطوة 8: التعامل مع DOM</h3>
+              <p>DOM هو تمثيل الصفحة داخل المتصفح، ويمكننا تعديله برمجياً.</p>
+<pre><code class="language-html">&lt;h2 id="title"&gt;مرحباً&lt;/h2&gt;
+&lt;button id="btn"&gt;تغيير النص&lt;/button&gt;
+
+&lt;script&gt;
+  const btn = document.getElementById('btn');
+
+  btn.addEventListener('click', () =&gt; {
+    document.getElementById('title').textContent =
+      'أهلاً بك في JavaScript';
+  });
+&lt;/script&gt;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> صفحة تفاعلية لإدارة قائمة بيانات (إضافة/حذف/تعديل).</div>
+            </div>
+
+            <!-- W9 -->
+            <div class="tab-pane fade lesson-pane" id="w9" data-section="web" data-lesson="w9" data-title="JS 9 · البيانات والتخزين">
+              <h3 class="lesson-title">JavaScript — الخطوة 9: التعامل مع البيانات</h3>
+              <p>Arrays وObjects وJSON وLocalStorage وSessionStorage والتعامل مع الأخطاء.</p>
+<pre><code class="language-javascript">// قراءة البيانات المحفوظة أو مصفوفة فارغة
+let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+function addTask(title) {
+  tasks.push({ id: Date.now(), title, done: false });
+  save();
+}
+
+function toggleTask(id) {
+  const task = tasks.find(t =&gt; t.id === id);
+  if (task) task.done = !task.done;
+  save();
+}
+
+function save() {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+addTask('دراسة Delphi');
+save();</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> برنامج مهام To-Do List يحفظ البيانات بعد إغلاق الصفحة.</div>
+            </div>
+
+            <!-- W10 -->
+            <div class="tab-pane fade lesson-pane" id="w10" data-section="web" data-lesson="w10" data-title="JS 10 · التعامل مع API">
+              <h3 class="lesson-title">JavaScript — الخطوة 10: التعامل مع API</h3>
+              <p>باستخدام <code>fetch</code> و<code>async/await</code> نتواصل مع الخادم عبر أفعال HTTP.</p>
+<pre><code class="language-javascript">async function loadCustomers() {
+  try {
+    const response = await fetch('/api/customers');
+
+    if (!response.ok) {
+      throw new Error('HTTP ' + response.status);
+    }
+
+    const customers = await response.json();
+    render(customers);
+  } catch (error) {
+    console.error('فشل تحميل البيانات:', error.message);
+  }
+}
+
+async function createCustomer(data) {
+  const response = await fetch('/api/customers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return response.json();
+}</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> صفحة تعرض بيانات قادمة من خدمة خارجية وتتيح إضافة عنصر جديد.</div>
+            </div>
+
+            <!-- W11 -->
+            <div class="tab-pane fade lesson-pane" id="w11" data-section="web" data-lesson="w11" data-title="BS 11 · أساسيات Bootstrap">
+              <h3 class="lesson-title">Bootstrap — الخطوة 11: الأساسيات</h3>
+              <p>Bootstrap يوفر نظام شبكة جاهزاً (Container / Row / Col) ونقاط توقف (Breakpoints)
+                 تجعل التصميم متجاوباً تلقائياً.</p>
+<pre><code class="language-html">&lt;div class="container"&gt;
+  &lt;div class="row g-3"&gt;
+    &lt;div class="col-12 col-md-6 col-lg-4"&gt;
+      &lt;div class="card p-3"&gt;البطاقة الأولى&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="col-12 col-md-6 col-lg-4"&gt;
+      &lt;div class="card p-3"&gt;البطاقة الثانية&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="col-12 col-md-6 col-lg-4"&gt;
+      &lt;div class="card p-3"&gt;البطاقة الثالثة&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> صفحة رئيسية متجاوبة بنظام شبكة Bootstrap.</div>
+            </div>
+
+            <!-- W12 -->
+            <div class="tab-pane fade lesson-pane" id="w12" data-section="web" data-lesson="w12" data-title="BS 12 · المكونات Components">
+              <h3 class="lesson-title">Bootstrap — الخطوة 12: المكونات</h3>
+              <p>Buttons، Cards، Tables، Forms، Alerts، Badges، Modals، Navbar، Dropdown.</p>
+<pre><code class="language-html">&lt;nav class="navbar navbar-expand-lg bg-body-tertiary"&gt;
+  &lt;div class="container"&gt;
+    &lt;a class="navbar-brand" href="#"&gt;نظامي&lt;/a&gt;
+    &lt;button class="navbar-toggler" data-bs-toggle="collapse"
+            data-bs-target="#navMenu"&gt;
+      &lt;span class="navbar-toggler-icon"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;div class="collapse navbar-collapse" id="navMenu"&gt;
+      &lt;ul class="navbar-nav"&gt;
+        &lt;li class="nav-item"&gt;&lt;a class="nav-link active" href="#"&gt;الرئيسية&lt;/a&gt;&lt;/li&gt;
+        &lt;li class="nav-item"&gt;&lt;a class="nav-link" href="#"&gt;العملاء&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/nav&gt;
+
+&lt;button class="btn btn-primary" data-bs-toggle="modal"
+        data-bs-target="#addModal"&gt;إضافة عميل&lt;/button&gt;</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> تصميم لوحة تحكم إدارية بالنافبار والبطاقات والنوافذ المنبثقة.</div>
+            </div>
+
+            <!-- W13 -->
+            <div class="tab-pane fade lesson-pane" id="w13" data-section="web" data-lesson="w13" data-title="BS 13 · Bootstrap المتقدم">
+              <h3 class="lesson-title">Bootstrap — الخطوة 13: المتقدم</h3>
+              <ul class="learn-list">
+                <li>تصميم Sidebar ثابت مع محتوى متحرك.</li>
+                <li>Navigation وDashboard وResponsive Tables.</li>
+                <li>Pagination وModal Forms.</li>
+                <li>تخصيص الألوان عبر CSS Variables.</li>
+                <li>الوضع الليلي عبر <code>data-bs-theme</code>.</li>
+              </ul>
+<pre><code class="language-css">:root {
+  --bs-primary: #6d28d9;
+}
+
+.sidebar {
+  width: 260px;
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  background: var(--bs-body-bg);
+  border-inline-end: 1px solid var(--bs-border-color);
+}
+
+.main-content {
+  margin-inline-start: 260px;
+  padding: 24px;
+}</code></pre>
+              <div class="callout">🎯 <strong>المشروع:</strong> لوحة تحكم كاملة لإدارة شركة (Sidebar + Navbar + Cards + Table + Modals).</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 5 : INTEGRATION
+    ============================================================ -->
+    <div class="tab-pane fade" id="tab-integrate">
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-plug"></i> المرحلة الثالثة — ربط Delphi بالويب</h2>
+        <p>هذه أهم مرحلة: <strong>Delphi</strong> يعالج البيانات ويتصل بقاعدة البيانات،
+           بينما <strong>HTML/CSS/JS</strong> تعرض البيانات وتتفاعل مع المستخدم، والوسيط بينهما هو <strong>REST API</strong> بصيغة JSON.</p>
+        <div class="roadmap mt-3">             المستخدم
+                 |
+        HTML + CSS + Bootstrap   ← (العرض)
+                 |
+             JavaScript        ← (الطلب عبر fetch)
+                 |
+              REST API         ← (JSON)
+                 |
+               Delphi          ← (المنطق)
+                 |
+             Database</div>
+      </div>
+
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-1-circle"></i> أولاً: خدمة REST في Delphi</h2>
+        <p>نجهّز مساراً باسم <code>GET /api/customers</code> يعيد قائمة العملاء بصيغة JSON:</p>
+<pre><code class="language-pascal">procedure TCustomerResource.GetCustomers(Request: TWebRequest;
+  Response: TWebResponse);
+var
+  Q: TFDQuery;
+  Arr: TJSONArray;
+  Obj: TJSONObject;
+begin
+  Arr := TJSONArray.Create;
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := DM.FDConnection1;
+    Q.SQL.Text := 'SELECT id, name, phone FROM Customers ORDER BY id';
+    Q.Open;
+
+    while not Q.Eof do
+    begin
+      Obj := TJSONObject.Create;
+      Obj.AddPair('id',    TJSONNumber.Create(Q.FieldByName('id').AsInteger));
+      Obj.AddPair('name',  Q.FieldByName('name').AsString);
+      Obj.AddPair('phone', Q.FieldByName('phone').AsString);
+      Arr.AddElement(Obj);
+      Q.Next;
+    end;
+
+    Response.ContentType := 'application/json; charset=utf-8';
+    Response.Content     := Arr.ToString;
+  finally
+    Q.Free;
+    Arr.Free;
+  end;
+end;</code></pre>
+        <p class="mt-2">الناتج الذي سيصل إلى المتصفح:</p>
+<pre><code class="language-json">[
+  { "id": 1, "name": "Ahmed",   "phone": "01000000000" },
+  { "id": 2, "name": "Mohamed", "phone": "01100000000" }
+]</code></pre>
+      </div>
+
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-2-circle"></i> ثانياً: صفحة HTML + Bootstrap</h2>
+<pre><code class="language-html">&lt;div class="container mt-4"&gt;
+  &lt;h2&gt;قائمة العملاء&lt;/h2&gt;
+
+  &lt;table class="table table-bordered table-hover align-middle"&gt;
+    &lt;thead class="table-light"&gt;
+      &lt;tr&gt;
+        &lt;th&gt;رقم&lt;/th&gt;
+        &lt;th&gt;الاسم&lt;/th&gt;
+        &lt;th&gt;الهاتف&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id="customers"&gt;
+      &lt;tr&gt;&lt;td colspan="3" class="text-center"&gt;جارٍ التحميل...&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-3-circle"></i> ثالثاً: JavaScript يطلب البيانات</h2>
+<pre><code class="language-javascript">async function loadCustomers() {
+  const tbody = document.getElementById('customers');
+
+  try {
+    const response = await fetch('/api/customers');
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+
+    const customers = await response.json();
+
+    tbody.innerHTML = customers.map(c =&gt; `
+      &lt;tr&gt;
+        &lt;td&gt;${escapeHtml(String(c.id))}&lt;/td&gt;
+        &lt;td&gt;${escapeHtml(c.name)}&lt;/td&gt;
+        &lt;td&gt;${escapeHtml(c.phone)}&lt;/td&gt;
+      &lt;/tr&gt;
+    `).join('');
+
+  } catch (err) {
+    tbody.innerHTML =
+      '&lt;tr&gt;&lt;td colspan="3" class="text-danger text-center"&gt;تعذر تحميل البيانات&lt;/td&gt;&lt;/tr&gt;';
+    console.error(err);
+  }
+}
+
+// حماية من حقن HTML
+function escapeHtml(str) {
+  return str.replace(/[&amp;&lt;&gt;"']/g, ch =&gt; ({
+    '&amp;': '&amp;amp;', '&lt;': '&lt;', '&gt;': '&gt;',
+    '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+loadCustomers();</code></pre>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title"><i class="bi bi-shield-check"></i> ملاحظات أمنية مهمة</h2>
+        <div class="callout danger">
+          <ul class="mb-0">
+            <li>تحقق دائماً من صحة البيانات على الخادم (Delphi) وليس على المتصفح فقط.</li>
+            <li>استخدم <strong>Parameterized Queries</strong> لمنع SQL Injection.</li>
+            <li>استخدم <code>escapeHtml</code> عند عرض نصوص قادمة من المستخدم لمنع XSS.</li>
+            <li>أضف مصادقة (Token / JWT) لكل مسار API.</li>
+            <li>تعامل مع أخطاء الاتصال وأعد رسائل خطأ عامة للمستخدم.</li>
+            <li>استخدم HTTPS دائماً في الإنتاج.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 6 : PROJECTS
+    ============================================================ -->
+    <div class="tab-pane fade" id="tab-projects">
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-kanban"></i> عشرة مشروعات متدرجة</h2>
+        <div class="table-responsive">
+          <table class="tbl">
+            <thead><tr><th>الدرجة</th><th>المشروع</th><th>التقنيات</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>صفحة شخصية</td><td>HTML</td></tr>
+              <tr><td>2</td><td>صفحة تسجيل دخول</td><td>HTML + CSS</td></tr>
+              <tr><td>3</td><td>آلة حاسبة</td><td>HTML + CSS + JS</td></tr>
+              <tr><td>4</td><td>برنامج إدارة مهام</td><td>HTML + CSS + JS</td></tr>
+              <tr><td>5</td><td>لوحة تحكم Dashboard</td><td>Bootstrap + JS</td></tr>
+              <tr><td>6</td><td>نظام إدارة العملاء</td><td>Bootstrap + JS + JSON</td></tr>
+              <tr><td>7</td><td>نظام إدارة الموظفين</td><td>Delphi + Database</td></tr>
+              <tr><td>8</td><td>نظام إدارة المخازن</td><td>Delphi + REST API + Web</td></tr>
+              <tr><td>9</td><td>نظام مبيعات ومشتريات</td><td>Delphi + Bootstrap + JS + SQL</td></tr>
+              <tr><td>10</td><td>نظام ERP متكامل</td><td>جميع التقنيات</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="accordion" id="projAcc">
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#p1">الدرجة 1 — صفحة شخصية</button></h2>
+          <div id="p1" class="accordion-collapse collapse show" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>الاسم والصورة.</li><li>معلومات شخصية.</li><li>المهارات.</li><li>وسائل التواصل.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p2">الدرجة 2 — صفحة تسجيل دخول</button></h2>
+          <div id="p2" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>اسم المستخدم وكلمة المرور.</li><li>زر تسجيل الدخول.</li><li>التحقق من المدخلات.</li><li>رسائل الخطأ.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p3">الدرجة 3 — آلة حاسبة</button></h2>
+          <div id="p3" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>الجمع والطرح والضرب والقسمة.</li><li>مسح النتائج.</li><li>التعامل مع القسمة على صفر.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p4">الدرجة 4 — إدارة المهام</button></h2>
+          <div id="p4" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>إضافة وتعديل وحذف مهمة.</li><li>تحديد المهمة المكتملة.</li><li>حفظ البيانات في LocalStorage.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p5">الدرجة 5 — لوحة تحكم Dashboard</button></h2>
+          <div id="p5" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>قائمة جانبية وقائمة علوية.</li><li>بطاقات إحصائية.</li><li>جداول ورسوم بيانية.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p6">الدرجة 6 — نظام إدارة العملاء</button></h2>
+          <div id="p6" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>إضافة وتعديل وحذف عميل.</li><li>البحث والتصفية.</li><li>عرض التفاصيل في Modal.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p7">الدرجة 7 — إدارة الموظفين بـ Delphi</button></h2>
+          <div id="p7" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>إنشاء قاعدة البيانات.</li><li>إضافة/تعديل/حذف الموظفين.</li><li>البحث وطباعة التقارير.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p8">الدرجة 8 — نظام المخازن (Web)</button></h2>
+          <div id="p8" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>تسجيل الأصناف.</li><li>إدخال وصرف المخزون.</li><li>متابعة الرصيد.</li><li>تنبيهات نقص المخزون.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p9">الدرجة 9 — المبيعات والمشتريات</button></h2>
+          <div id="p9" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list"><li>العملاء والموردون والأصناف.</li><li>الفواتير والخصومات والضرائب.</li><li>المدفوعات والتقارير.</li></ul>
+          </div></div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#p10">الدرجة 10 — نظام ERP متكامل</button></h2>
+          <div id="p10" class="accordion-collapse collapse" data-bs-parent="#projAcc"><div class="accordion-body">
+            <ul class="learn-list">
+              <li>إدارة المستخدمين والصلاحيات.</li>
+              <li>الموارد البشرية والعملاء والموردين.</li>
+              <li>المخازن والمبيعات والمشتريات.</li>
+              <li>الحسابات والتقارير ولوحة التحكم المركزية.</li>
+            </ul>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 7 : TIMELINE
+    ============================================================ -->
+    <div class="tab-pane fade" id="tab-timeline">
+      <div class="panel mb-4">
+        <h2 class="section-title"><i class="bi bi-calendar3"></i> خطة زمنية مقترحة — 8 أشهر</h2>
+        <div class="table-responsive">
+          <table class="tbl">
+            <thead><tr><th>الشهر</th><th>الموضوع</th><th>النتيجة المتوقعة</th></tr></thead>
+            <tbody>
+              <tr><td>الأول</td><td>أساسيات Delphi</td><td>كتابة البرامج البسيطة</td></tr>
+              <tr><td>الثاني</td><td>OOP والملفات</td><td>برامج عملية</td></tr>
+              <tr><td>الثالث</td><td>قواعد البيانات وSQL</td><td>نظام إدارة بيانات</td></tr>
+              <tr><td>الرابع</td><td>Delphi المتقدم وREST API</td><td>بناء خدمات البيانات</td></tr>
+              <tr><td>الخامس</td><td>HTML وCSS</td><td>تصميم صفحات الويب</td></tr>
+              <tr><td>السادس</td><td>JavaScript</td><td>إنشاء صفحات تفاعلية</td></tr>
+              <tr><td>السابع</td><td>Bootstrap</td><td>تصميم أنظمة إدارية</td></tr>
+              <tr><td>الثامن</td><td>الربط والمشروعات</td><td>نظام متكامل</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout mt-3">
+          <strong>الروتين اليومي المقترح:</strong> ساعتان يومياً — 40 دقيقة قراءة وشرح،
+          60 دقيقة تطبيق عملي، 20 دقيقة مراجعة وتدوين الملاحظات.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title"><i class="bi bi-bullseye"></i> مشروع واحد يتطور معك</h2>
+        <p>الأفضل أن تعتمد مشروعاً واحداً — <strong>نظام إدارة شركة</strong> — يتطور خلال الدراسة:</p>
+        <ul class="learn-list">
+          <li>في البداية ننشئه باستخدام Delphi كتطبيق سطح مكتب.</li>
+          <li>بعد ذلك ننشئ قاعدة بياناته.</li>
+          <li>ثم نبني واجهة ويب باستخدام HTML وCSS.</li>
+          <li>ثم نطورها باستخدام JavaScript وBootstrap.</li>
+          <li>أخيراً نربط الواجهة بخدمات Delphi REST API.</li>
+        </ul>
+        <div class="callout">بهذه الطريقة تتعلم كل تقنية في سياق عملي حقيقي، وليس مجرد حفظ أوامر وأكواد.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="container site">
+  <div class="d-flex justify-content-between flex-wrap gap-2">
+    <span>منهج تعليمي متكامل: Delphi → الويب → REST API → ERP</span>
+    <span>صُمم باستخدام Bootstrap 5 · HTML · CSS · JavaScript</span>
+  </div>
+</footer>
+
+<button class="btn btn-primary back-top" id="backTop" title="أعلى الصفحة"><i class="bi bi-arrow-up"></i></button>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/pascal.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ============ 1) بناء قوائم الدروس ديناميكياً ============ */
+  document.querySelectorAll('.lesson-layout').forEach(function (layout) {
+    const navEl = layout.querySelector('.lesson-nav');
+    const panes = layout.querySelectorAll('.lesson-pane');
+
+    panes.forEach(function (pane, index) {
+      // زر التنقل
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'nav-link' + (index === 0 ? ' active' : '');
+      btn.setAttribute('data-bs-toggle', 'pill');
+      btn.setAttribute('data-bs-target', '#' + pane.id);
+      btn.setAttribute('role', 'tab');
+      btn.innerHTML =
+        '<span class="lbl">' + pane.dataset.title + '</span>' +
+        '<i class="bi bi-check-circle-fill tick"></i>';
+      navEl.appendChild(btn);
+
+      // شريط أعلى الدرس: ترقيم + زر الإنجاز
+      const head = document.createElement('div');
+      head.className = 'd-flex justify-content-between align-items-center flex-wrap gap-2 mb-3';
+      head.innerHTML =
+        '<span class="text-muted small">الدرس ' + (index + 1) + ' من ' + panes.length + '</span>' +
+        '<button class="btn btn-sm btn-outline-success mark-btn" data-lesson="' + pane.id + '">' +
+        '<i class="bi bi-circle"></i> تعليم كمُنجز</button>';
+      pane.prepend(head);
+
+      // أزرار السابق / التالي
+      const foot = document.createElement('div');
+      foot.className = 'lesson-foot d-flex justify-content-between';
+      const prev = index > 0
+        ? '<button class="btn btn-sm btn-outline-secondary" data-goto="' + panes[index - 1].id + '">' +
+          '<i class="bi bi-arrow-right"></i> الدرس السابق</button>' : '<span></span>';
+      const next = index < panes.length - 1
+        ? '<button class="btn btn-sm btn-primary" data-goto="' + panes[index + 1].id + '">' +
+          'الدرس التالي <i class="bi bi-arrow-left"></i></button>' : '<span></span>';
+      foot.innerHTML = prev + next;
+      pane.appendChild(foot);
+    });
+  });
+
+  /* ============ 2) نظام تتبّع التقدم ============ */
+  const STORAGE_KEY = 'dgr_progress_v1';
+  let done;
+  try {
+    done = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+  } catch (e) {
+    done = new Set();
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(done)));
+    } catch (e) { /* تجاهل */ }
+  }
+
+  function refresh() {
+    // أزرار الإنجاز
+    document.querySelectorAll('.lesson-pane').forEach(function (pane) {
+      const isDone = done.has(pane.id);
+      pane.classList.toggle('is-done', isDone);
+
+      const b = pane.querySelector('.mark-btn');
+      if (b) {
+        b.className = 'btn btn-sm mark-btn ' + (isDone ? 'btn-success' : 'btn-outline-success');
+        b.innerHTML = isDone
+          ? '<i class="bi bi-check2-circle"></i> تم الإنجاز'
+          : '<i class="bi bi-circle"></i> تعليم كمُنجز';
+      }
+    });
+
+    // علامات الصح في القائمة
+    document.querySelectorAll('.lesson-nav .nav-link').forEach(function (link) {
+      const id = (link.getAttribute('data-bs-target') || '').replace('#', '');
+      link.classList.toggle('done', done.has(id));
+    });
+
+    // أشرطة تقدم كل مرحلة
+    document.querySelectorAll('[data-progress]').forEach(function (el) {
+      const section = el.dataset.progress;
+      const list = Array.prototype.slice.call(
+        document.querySelectorAll('.lesson-pane[data-section="' + section + '"]')
+      );
+      const completed = list.filter(function (x) { return done.has(x.id); }).length;
+      const pct = list.length ? Math.round((completed / list.length) * 100) : 0;
+
+      const bar = el.querySelector('.progress-bar');
+      bar.style.width = pct + '%';
+      bar.textContent = pct + '%';
+
+      const lbl = el.querySelector('.prog-label');
+      if (lbl) lbl.textContent = completed + ' من ' + list.length + ' دروس';
+    });
+
+    // الشريط الكلي
+    const all = Array.prototype.slice.call(document.querySelectorAll('.lesson-pane'));
+    const doneAll = all.filter(function (x) { return done.has(x.id); }).length;
+    const pctAll = all.length ? Math.round((doneAll / all.length) * 100) : 0;
+
+    document.getElementById('overallBar').style.width = pctAll + '%';
+    document.getElementById('overallPct').textContent = pctAll + '%';
+    document.getElementById('overallCount').textContent = doneAll + ' / ' + all.length + ' درس';
+  }
+
+  /* ============ 3) تفاعلات عامة ============ */
+  document.addEventListener('click', function (e) {
+
+    // تعليم / إلغاء تعليم الدرس
+    const markBtn = e.target.closest('.mark-btn');
+    if (markBtn) {
+      const id = markBtn.dataset.lesson;
+      if (done.has(id)) done.delete(id); else done.add(id);
+      save();
+      refresh();
+      return;
+    }
+
+    // الانتقال بين الدروس
+    const gotoBtn = e.target.closest('[data-goto]');
+    if (gotoBtn) {
+      const id = gotoBtn.dataset.goto;
+      const trigger = document.querySelector('.lesson-nav [data-bs-target="#' + id + '"]');
+      if (trigger) {
+        bootstrap.Tab.getOrCreateInstance(trigger).show();
+        const pane = document.getElementById(id);
+        if (pane) pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  });
+
+  /* ============ 4) زر النسخ في كل كتلة كود ============ */
+  document.querySelectorAll('pre').forEach(function (pre) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.textContent = 'نسخ';
+    btn.addEventListener('click', function () {
+      const code = pre.querySelector('code');
+      const text = code ? code.innerText : pre.innerText;
+      const doneCopy = function () {
+        btn.textContent = 'تم النسخ ✓';
+        setTimeout(function () { btn.textContent = 'نسخ'; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(doneCopy).catch(doneCopy);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(ta);
+        doneCopy();
+      }
+    });
+    pre.appendChild(btn);
+  });
+
+  /* ============ 5) تلوين الأكواد ============ */
+  if (window.hljs) {
+    hljs.highlightAll();
+  }
+
+  /* ============ 6) بحث الدروس ============ */
+  const search = document.getElementById('lessonSearch');
+  if (search) {
+    search.addEventListener('input', function () {
+      const q = search.value.trim().toLowerCase();
+      document.querySelectorAll('#tab-delphi .lesson-nav .nav-link').forEach(function (link) {
+        const txt = link.textContent.toLowerCase();
+        link.style.display = (!q || txt.indexOf(q) !== -1) ? '' : 'none';
+      });
+    });
+  }
+
+  /* ============ 7) الوضع الليلي ============ */
+  const themeBtn = document.getElementById('themeBtn');
+  const html = document.documentElement;
+
+  function applyTheme(theme) {
+    html.setAttribute('data-bs-theme', theme);
+    themeBtn.innerHTML = theme === 'dark'
+      ? '<i class="bi bi-sun-fill"></i>'
+      : '<i class="bi bi-moon-stars"></i>';
+    try { localStorage.setItem('dgr_theme', theme); } catch (e) {}
+  }
+
+  let savedTheme = 'light';
+  try { savedTheme = localStorage.getItem('dgr_theme') || 'light'; } catch (e) {}
+  applyTheme(savedTheme);
+
+  themeBtn.addEventListener('click', function () {
+    applyTheme(html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ============ 8) زر العودة لأعلى ============ */
+  const backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', function () {
+    backTop.style.display = window.scrollY > 400 ? 'flex' : 'none';
+  });
+  backTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ============ 9) التهيئة النهائية ============ */
+  refresh();
+
+})();
+</script>
+</body>
+</html>
