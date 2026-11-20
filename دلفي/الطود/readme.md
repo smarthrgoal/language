@@ -363,8 +363,8 @@ great-pyramid-academy/
 
 ## 📞 التواصل
 
-- 🌐 **الموقع**: [great-pyramid-academy](#)
-- 📧 **البريد**: info@great-pyramid-academy.com
+- 🌐 **الموقع**: [youtube.com/@smarthrgoal](#)
+- 📧 **البريد**: instagram.com/smarthrgoal
 - 💬 **GitHub Issues**: [أبلغ عن مشكلة](../../issues)
 
 ---
